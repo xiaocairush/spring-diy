@@ -1,0 +1,69 @@
+plugins {
+	id 'com.github.johnrengelman.shadow' version '7.1.2' apply false
+}
+
+repositories {
+	// Use Maven Central for resolving dependencies.
+	mavenCentral()
+}
+
+ext {
+	moduleProjects = subprojects.findAll { it.name.startsWith("spring-") }
+	javaProjects = subprojects
+}
+
+configure(allprojects) { project ->
+	configurations.all {
+		resolutionStrategy {
+			cacheChangingModulesFor 0, "seconds"
+			cacheDynamicVersionsFor 0, "seconds"
+		}
+	}
+}
+
+configure([rootProject] + javaProjects) { project ->
+
+	apply plugin: "java"
+//	apply plugin: "java-test-fixtures"
+
+	group = "spring.diy"
+
+	version '1.0.0'
+
+	java {
+		toolchain {
+			languageVersion.set(JavaLanguageVersion.of(11))
+		}
+	}
+
+	configurations {
+
+	}
+
+	test {
+		include(["**/*Tests.class", "**/*Test.class", "**/Test*.class"])
+		systemProperty("java.awt.headless", "true")
+		systemProperty("testGroups", project.properties.get("testGroups"))
+		systemProperty("io.netty.leakDetection.level", "paranoid")
+		systemProperty("io.netty5.leakDetectionLevel", "paranoid")
+		systemProperty("io.netty5.leakDetection.targetRecords", "32")
+		systemProperty("io.netty5.buffer.lifecycleTracingEnabled", "true")
+		systemProperty("io.netty5.buffer.leakDetectionEnabled", "true")
+		jvmArgs(["--add-opens=java.base/java.lang=ALL-UNNAMED",
+				 "--add-opens=java.base/java.util=ALL-UNNAMED"])
+	}
+
+	dependencies {
+		implementation group: 'cglib', name: 'cglib', version: '3.3.0'
+
+		// Use JUnit test framework.
+		testImplementation 'junit:junit:4.13.2'
+		testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+		testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+	}
+}
+
+configure(rootProject) {
+	description = "Spring DIY Framework"
+
+}

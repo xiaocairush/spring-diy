@@ -1,0 +1,6 @@
+dependencies {
+    implementation(project(":spring-beans"))
+    implementation group: 'aopalliance', name: 'aopalliance', version: '1.0'
+    implementation group: 'org.aspectj', name: 'aspectjweaver', version: '1.9.7'
+    testImplementation(project(":spring-beans"))
+}
